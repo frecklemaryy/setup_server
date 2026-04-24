@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source ".env"
-
+read -r -p "Имя хоста, будет применяться как в hostname, так и в названиях public-ключей. HOST_LOCATION: " HOST_LOCATION
 echo "HOST_LOCATION: $HOST_LOCATION"
-echo "MacOS auth key: $MACOS_AUTH_KEY"
+echo ""
+read -r -p "Публичный ключ для доступа с удаленного компьютера. MacOS auth key: $MACOS_AUTH_KEY: " MACOS_AUTH_KEY
+echo "MACOS_AUTH_KEY: $MACOS_AUTH_KEY"
+echo ""
 
 # Регистрация пользователя dim
 useradd -m -c "${HOST_LOCATION}" dim
@@ -89,14 +91,28 @@ chown -R dim:dim /home/dim/monitoring
 echo "Переключение пользователя -> USER:dim"
 echo ""
 su dim
-sudo ls
 cd ~
+sudo ls
 
 # Настройка SSH пользователя dim
-mkdir "${HOME}/.ssh" && chmod 700 "${HOME}/.ssh"
-echo "${MACOS_AUTH_KEY}" >> "${HOME}/.ssh/authorized_keys" && chmod 600 "${HOME}/.ssh/authorized_keys"
+mkdir "/home/dim/.ssh" && chmod 700 "/home/dim/.ssh"
+echo "${MACOS_AUTH_KEY}" >> "/home/dim/.ssh/authorized_keys" && chmod 600 "/home/dim/.ssh/authorized_keys"
 
 # Выбор редактора: VIM
-echo 'export EDITOR=vim' >> ~/.bashrc && echo 'export VISUAL=vim' >> ~/.bashrc
-source ~/.bashrc
+echo 'export EDITOR=vim' >> "/home/dim/.bashrc" && echo 'export VISUAL=vim' >> "/home/dim/.bashrc"
+source "/home/dim/.bashrc"
 sudo update-alternatives --config editor
+
+# Настройка доступа к github.com
+echo "Настройка доступа к github.com."
+echo "Регистрация id_ed25519.pub"
+echo ""
+ssh-keygen -t ed25519 -C "${HOST_LOCATION}@bonifazy" -f "/home/dim/.ssh/id_ed25519"
+chmod 700 "/home/dim/.ssh" && chmod 600 "/home/dim/.ssh/id_ed25519" && chmod 644 "/home/dim/.ssh/id_ed25519.pub"
+cat >> "/home/dim/.bashrc" <<'EOF'
+eval "$(ssh-agent -s)" >/dev/null
+ssh-add ~/.ssh/id_ed25519 2>/dev/null
+EOF
+source "/home/dim/.bashrc"
+echo "cat ~/.ssh/id_ed25519.pub:"
+cat "/home/dim/.ssh/id_ed25519.pub"
