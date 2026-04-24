@@ -49,7 +49,8 @@ timedatectl set-timezone "Europe/Moscow"
 #Настройка ufw
 ufw allow from 62.113.113.93 proto tcp to any port 32755 comment "ssh from Moscow VDSina" &&
 ufw allow from 93.183.92.89 proto tcp to any port 32755 comment "ssh from Moscow VDSina" &&
-ufw allow from 91.201.112.87 proto tcp to any port 32755 comment "ssh from Amsterdam VDSina"
+ufw allow from 91.201.112.87 proto tcp to any port 32755 comment "ssh from Amsterdam VDSina" &&
+ufw allow from 194.156.102.107 proto tcp to any port 32755 comment "ssh from Zurich"
 ufw allow 443/tcp comment "Xray" && ufw allow 443/udp comment "Xray"
 ufw enable && ufw reload && ufw status
 
@@ -84,7 +85,8 @@ sudo ls
 cd ~
 
 # Настройка SSH пользователя dim
-mkdir ~/.ssh && chmod 700 ~/.ssh echo "${MACOS_AUTH_KEY}" >> "~/.ssh/authorized_keys" && chmod 600 "~/.ssh/authorized_keys"
+mkdir "${HOME}/.ssh" && chmod 700 "${HOME}/.ssh"
+echo "${MACOS_AUTH_KEY}" >> "${HOME}/.ssh/authorized_keys" && chmod 600 "${HOME}/.ssh/authorized_keys"
 
 # Выбор редактора: VIM
 echo 'export EDITOR=vim' >> ~/.bashrc && echo 'export VISUAL=vim' >> ~/.bashrc
