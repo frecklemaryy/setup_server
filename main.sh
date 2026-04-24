@@ -77,6 +77,14 @@ sysctl -p
 CRON
 ) | crontab -
 
+# Обновление пакетов
+apt update && apt upgrade -y && apt autoremove -y
+apt install file vim ufw cron git gh socat nginx python3.12-venv vnstat iftop -y
+
+# Копирование monitoring/ -> /home/dim/
+cp -r monitoring/ /home/dim/
+chown -R dim:dim /home/dim/monitoring
+
 # Переключение пользователя на dim
 echo "Переключение пользователя -> USER:dim"
 echo ""
